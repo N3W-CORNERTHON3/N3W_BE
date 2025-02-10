@@ -16,4 +16,8 @@ public class MissionService {
         return missionRepository.findById(missionId)
                 .orElseThrow(() -> new MissionNotFoundException(missionId));
     }
+
+    public boolean hasOngoingMission(String userId) {
+        return missionRepository.existsByUserIdAndStatus(userId, MissionEntity.Status.PROGRESSING);
+    }
 }
