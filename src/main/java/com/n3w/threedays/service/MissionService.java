@@ -1,8 +1,9 @@
 package com.n3w.threedays.service;
 
 import com.n3w.threedays.entity.MissionEntity;
+import com.n3w.threedays.exception.MissionNotFoundException;
 import com.n3w.threedays.repository.MissionRepository;
-import jakarta.persistence.EntityNotFoundException;
+//import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,6 @@ public class MissionService {
 
     public MissionEntity getMissionById(Long missionId) {
         return missionRepository.findById(missionId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 미션을 찾을 수 없습니다. ID: " + missionId));
+                .orElseThrow(() -> new MissionNotFoundException(missionId));
     }
 }
