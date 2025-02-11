@@ -89,7 +89,7 @@ public class MissionController {
         );
         newMission.setMemo(requestDto.getMemo());
 
-        // 🔹 미션 저장
+        // 미션 저장
         MissionEntity savedMission = missionService.createMission(newMission);
 
         return ResponseEntity.ok(savedMission);
