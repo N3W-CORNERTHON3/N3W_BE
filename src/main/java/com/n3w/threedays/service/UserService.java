@@ -24,8 +24,8 @@ public class UserService {
     // 회원가입
     public void signup(SignupRequestDto request){
         // 아이디 중복 확인
-        if (userRepository.existsById(request.getId())) {
-            throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
+        if (checkId(request.getId())) {
+            throw new IllegalArgumentException("사용 중인 아이디입니다.");
         }
 
         // 비번 암호화
@@ -34,6 +34,11 @@ public class UserService {
         UserEntity user = new UserEntity(request.getId(), encodedPassword);
 
         userRepository.save(user);
+    }
+
+    // 아이디 중복 확인
+    public boolean checkId(String id) {
+        return userRepository.existsById(id);
     }
 
     // 로그인

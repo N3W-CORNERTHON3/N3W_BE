@@ -8,10 +8,7 @@ import com.n3w.threedays.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/member")
@@ -19,9 +16,29 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     private final UserService userService;
 
+    // 아이디 중복 체크
+    @GetMapping("/checkId")
+    public ResponseEntity<ResponseDto<Integer>> checkIdDuplicate(@RequestParam String id) {
+        boolean isDuplicate = userService.checkId(id);
+        ResponseDto<Integer> response;
+        
+        if(isDuplicate){
+            response = new ResponseDto<>(400, false,"중복 아이디", 1);
+        } else {
+            response = new ResponseDto<>(200, true,"사용 가능한 아이디", 1);
+        }
+        
+        return ResponseEntity.ok(response);
+    }
+
     // 회원가입
     @PostMapping("/signup")
     public ResponseEntity<ResponseDto<Integer>> signup(@Valid @RequestBody SignupRequestDto request){
+        boolean isCheckId = userService.checkId(request.getId());
+        if (isCheckId){
+            return ResponseEntity.badRequest().body(new ResponseDto<>(400, false, "아이디 중복", 0));
+        }
+
         userService.signup(request);
 
         ResponseDto<Integer> response = new ResponseDto<>(200, true, "회원가입 성공", 1);
