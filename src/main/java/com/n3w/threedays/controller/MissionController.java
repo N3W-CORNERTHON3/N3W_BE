@@ -43,4 +43,14 @@ public class MissionController {
         MissionEntity randomMission = missionService.getRandomMission(userId, level, category, includeCompleted);
         return ResponseEntity.ok(randomMission);
     }
+
+    // [미션 상태 변경]
+    @PutMapping("status/{missionId}/status")
+    public ResponseEntity<MissionEntity> updateMissionStatus(
+            @PathVariable Long missionId,
+            @RequestParam MissionEntity.Status newStatus) {
+
+        MissionEntity updatedMission = missionService.updateMissionStatus(missionId, newStatus);
+        return ResponseEntity.ok(updatedMission);
+    }
 }
