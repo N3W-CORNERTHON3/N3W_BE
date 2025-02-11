@@ -69,4 +69,8 @@ public class MissionService {
         mission.setStatus(newStatus);
         return mission; // 변경된 미션 반환
     }
+
+    public MissionEntity createMission(MissionEntity mission) {
+        return missionRepository.save(mission);
+    }
 }

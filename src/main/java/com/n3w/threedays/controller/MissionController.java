@@ -1,5 +1,6 @@
 package com.n3w.threedays.controller;
 
+import com.n3w.threedays.dto.MissionRequestDto;
 import com.n3w.threedays.entity.MissionEntity;
 import com.n3w.threedays.security.JwtTokenProvider;
 import com.n3w.threedays.service.MissionService;
@@ -69,5 +70,30 @@ public class MissionController {
         MissionEntity updatedMission = missionService.updateMissionStatus(missionId, userId, newStatus);
         return ResponseEntity.ok(updatedMission);
     }
+
+    // [미션 생성]
+    @PostMapping
+    public ResponseEntity<MissionEntity> createMission(
+            @RequestHeader("Authorization") String token,
+            @RequestBody MissionRequestDto requestDto) {
+
+        // 토큰에서 사용자 정보 추출
+        Authentication authentication = jwtTokenProvider.getAuthentication(token.replace("Bearer ", ""));
+        String userId = authentication.getName();  // userId 가져오기
+
+        MissionEntity newMission = new MissionEntity(
+                userId,
+                requestDto.getName(),
+                requestDto.getCategory(),
+                requestDto.getLevel()
+        );
+        newMission.setMemo(requestDto.getMemo());
+
+        // 🔹 미션 저장
+        MissionEntity savedMission = missionService.createMission(newMission);
+
+        return ResponseEntity.ok(savedMission);
+    }
+
 
 }
