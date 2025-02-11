@@ -10,17 +10,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -60,22 +55,15 @@ public class JwtTokenProvider {
     }
 
     // 토큰에서 사용자 정보 추출
-    public Authentication getAuthentication(String toekn) {
-        Claims claims = getClaims(toekn);
+    public Authentication getAuthentication(String token) {
+        Claims claims = getClaims(token);
 
-        String auth = Optional.ofNullable(claims.get("auth", String.class))
-                .orElseThrow(() -> new RuntimeException("잘못된 토큰입니다."));
-        String userId = Optional.ofNullable(claims.get("userId", String.class))
-                .orElseThrow(() -> new RuntimeException("잘못된 토큰입니다."));
+        // userId만 추출
+        String userId = claims.getSubject();  // Subject는 userId로 사용
 
-        Collection<GrantedAuthority> authorities = Arrays.stream(auth.split(","))
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
-
-        UserDetails principal = new CustomUser(userId, claims.getSubject(), "", authorities);
-        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
+        UserDetails principal = new CustomUser(userId, userId, "", new ArrayList<>());
+        return new UsernamePasswordAuthenticationToken(principal, "", new ArrayList<>());
     }
-
 
     // 토큰에서 Claims 추출
     private Claims getClaims(String token) {
@@ -85,4 +73,5 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody();
     }
+
 }
