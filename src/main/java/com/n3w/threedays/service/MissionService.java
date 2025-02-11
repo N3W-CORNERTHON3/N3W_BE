@@ -3,10 +3,12 @@ package com.n3w.threedays.service;
 import com.n3w.threedays.entity.MissionEntity;
 import com.n3w.threedays.exception.MissionNotFoundException;
 import com.n3w.threedays.exception.NoRandomMissionFoundException;
+import com.n3w.threedays.exception.UnauthorizedException;
 import com.n3w.threedays.repository.MissionRepository;
-//import jakarta.persistence.EntityNotFoundException;
+import com.n3w.threedays.security.JwtTokenProvider;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -17,6 +19,7 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class MissionService {
     private final MissionRepository missionRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     // [특정 미션 조회]
     public MissionEntity getMissionById(Long missionId) {
@@ -52,15 +55,18 @@ public class MissionService {
 
     // [미션 상태 변경]
     @Transactional
-    public MissionEntity updateMissionStatus(Long missionId, MissionEntity.Status newStatus) {
-        // 1. 미션 조회 (없으면 예외 발생)
+    public MissionEntity updateMissionStatus(Long missionId, String userId, MissionEntity.Status newStatus) {
+        // 미션 조회(없으면 예외 발생)
         MissionEntity mission = missionRepository.findById(missionId)
                 .orElseThrow(() -> new MissionNotFoundException(missionId));
 
-        // 2. 상태 변경
-        mission.setStatus(newStatus);
+        // 로그인한 사용자의 미션인지 확인
+        if (!mission.getUserId().equals(userId)) {
+            throw new UnauthorizedException("해당 미션을 수정할 권한이 없습니다.");
+        }
 
-        // 3. 변경된 미션 반환
-        return mission;
+        // 상태 변경
+        mission.setStatus(newStatus);
+        return mission; // 변경된 미션 반환
     }
 }
