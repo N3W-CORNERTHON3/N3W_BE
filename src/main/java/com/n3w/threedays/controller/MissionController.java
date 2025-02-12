@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -133,7 +134,7 @@ public class MissionController {
     }
 
 
-    // [목록 유무 조회]
+    // [미션 목록 유무 조회]
     @GetMapping("/exists")
     public ResponseEntity<Map<String, Boolean>> checkRegisteredMission(@RequestHeader("Authorization") String token) {
         // 토큰에서 사용자 정보 추출
@@ -148,5 +149,24 @@ public class MissionController {
         return ResponseEntity.ok(response);
     }
 
+    // [전체 미션 목록 조회]
+    @GetMapping
+    public ResponseEntity<?> allMission(@RequestHeader("Authorization") String token) {
+        // 토큰에서 사용자 정보 추출
+        Authentication authentication = jwtTokenProvider.getAuthentication(token.replace("Bearer ", ""));
+        String userId = authentication.getName();  // userId 가져오기
+
+        // 사용자의 모든 미션 조회
+        List<MissionEntity> missions = missionService.getAllMissions(userId);
+
+        // 미션이 없는 경우
+        if (missions.isEmpty()) {
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "미션이 존재하지 않습니다.");
+            return ResponseEntity.ok(response);
+        }
+
+        return ResponseEntity.ok(missions);
+    }
 
 }

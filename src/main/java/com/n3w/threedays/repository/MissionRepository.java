@@ -22,4 +22,7 @@ public interface MissionRepository extends JpaRepository<MissionEntity, Long> {
     // 사용자가 등록한 미션 유무 확인
     boolean existsByUserId(String userId);
 
+    // 사용자의 전체 미션 목록
+    List<MissionEntity> findByUserId(String userId);
+
 }

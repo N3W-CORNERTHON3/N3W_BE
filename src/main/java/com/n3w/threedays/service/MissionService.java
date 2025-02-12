@@ -121,4 +121,9 @@ public class MissionService {
         return missionRepository.existsByUserId(userId);
     }
 
+    // [전체 미션 목록 조회]
+    public List<MissionEntity> getAllMissions(String userId) {
+        return missionRepository.findByUserId(userId);
+    }
+
 }
