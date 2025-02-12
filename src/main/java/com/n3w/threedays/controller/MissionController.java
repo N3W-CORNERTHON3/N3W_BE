@@ -169,4 +169,28 @@ public class MissionController {
         return ResponseEntity.ok(missions);
     }
 
+    // [카테고리 별 미션 목록 조회]
+    @GetMapping("/category/{category}")
+    public ResponseEntity<?> getMissionsByCategory(
+            @RequestHeader("Authorization") String token,
+            @PathVariable MissionEntity.Category category) {
+
+        // 토큰에서 사용자 정보 추출
+        Authentication authentication = jwtTokenProvider.getAuthentication(token.replace("Bearer ", ""));
+        String userId = authentication.getName();  // userId 가져오기
+
+        // 특정 카테고리의 미션 목록 조회
+        List<MissionEntity> missions = missionService.getMissionsByCategory(userId, category);
+
+        // 미션이 없는 경우
+        if (missions.isEmpty()) {
+            Map<String, String> response = new HashMap<>();
+            response.put("message", category.name() + " 카테고리에 미션이 존재하지 않습니다.");
+            return ResponseEntity.ok(response);
+        }
+
+        return ResponseEntity.ok(missions);
+    }
+
+
 }

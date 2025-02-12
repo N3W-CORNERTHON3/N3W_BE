@@ -126,4 +126,9 @@ public class MissionService {
         return missionRepository.findByUserId(userId);
     }
 
+    // [카테고리 별 미션 목록 조회]
+    public List<MissionEntity> getMissionsByCategory(String userId, MissionEntity.Category category) {
+        return missionRepository.findByUserIdAndCategory(userId, category);
+    }
+
 }

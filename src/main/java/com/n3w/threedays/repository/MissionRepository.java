@@ -25,4 +25,6 @@ public interface MissionRepository extends JpaRepository<MissionEntity, Long> {
     // 사용자의 전체 미션 목록
     List<MissionEntity> findByUserId(String userId);
 
+    // 아이디와 카테고리로 미션 확인
+    List<MissionEntity> findByUserIdAndCategory(String userId, MissionEntity.Category category);
 }
