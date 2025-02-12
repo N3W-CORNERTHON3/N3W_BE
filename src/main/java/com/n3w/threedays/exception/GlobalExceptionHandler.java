@@ -2,6 +2,7 @@ package com.n3w.threedays.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -35,18 +36,39 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
+    @ExceptionHandler(NullException.class)
+    public ResponseEntity<Map<String, String>> NullException(NullException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }
+
     @ExceptionHandler(DuplicateIDException.class)
-    public ResponseEntity<Map<String, String>> DuplicateIDException(DuplicateIDException ex) {
+    public ResponseEntity<Map<String, String>> handleDuplicateIDException(DuplicateIDException ex) {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
     @ExceptionHandler(IncorrectLoginException.class)
-    public ResponseEntity<Map<String, String>> IncorrectLoginException(IncorrectLoginException ex) {
+    public ResponseEntity<Map<String, String>> handleIncorrectLoginException(IncorrectLoginException ex) {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handlencorrectSignupException(IncorrectSignupException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(NotFoundUserInfoException.class)
+    public ResponseEntity<Map<String, String>> handleNotFoundUserInfoException(NotFoundUserInfoException ex){
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 }
 

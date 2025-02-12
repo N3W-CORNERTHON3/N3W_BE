@@ -1,14 +1,13 @@
 package com.n3w.threedays.controller;
 
-import com.n3w.threedays.dto.LoginRequestDto;
-import com.n3w.threedays.dto.ResponseDto;
-import com.n3w.threedays.dto.SignupRequestDto;
-import com.n3w.threedays.dto.TokenResponseDto;
+import com.n3w.threedays.dto.*;
 import com.n3w.threedays.exception.DuplicateIDException;
+import com.n3w.threedays.security.JwtTokenProvider;
 import com.n3w.threedays.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     // 아이디 중복 체크
     @GetMapping("/checkId")
@@ -35,11 +35,6 @@ public class UserController {
     // 회원가입
     @PostMapping("/signup")
     public ResponseEntity<ResponseDto<Integer>> signup(@Valid @RequestBody SignupRequestDto request){
-        boolean duplicateId = userService.checkId(request.getId());
-        if (duplicateId){
-            throw new DuplicateIDException("사용 중인 아이디");
-        }
-
         userService.signup(request);
 
         ResponseDto<Integer> response = new ResponseDto<>(200, true, "회원가입 성공", 1);
@@ -53,6 +48,19 @@ public class UserController {
         TokenResponseDto token = userService.login(request);
 
         ResponseDto<TokenResponseDto> response = new ResponseDto<>(200, true, "로그인 성공", token);
+
+        return ResponseEntity.ok(response);
+    }
+
+    // 프로필 조회
+    @GetMapping("/profiles")
+    public ResponseEntity<ResponseDto<ProfilesResponseDto>> getUserInfo(@RequestHeader("Authorization") String token){
+        Authentication authentication = jwtTokenProvider.getAuthentication(token.replace("Bearer ", ""));
+        String userId = authentication.getName();
+
+        ProfilesResponseDto userInfo = userService.getUserInfo(userId);;
+
+        ResponseDto<ProfilesResponseDto> response = new ResponseDto<>(200, true, "프로필 조회 성공", userInfo);
 
         return ResponseEntity.ok(response);
     }

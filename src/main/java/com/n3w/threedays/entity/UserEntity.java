@@ -5,7 +5,6 @@ import lombok.*;
 
 @Entity
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class UserEntity {
     @Id
@@ -15,10 +14,17 @@ public class UserEntity {
     @Column(nullable = false)
     private String password;
 
-    private String profileImg = "src/main/resources/static/default/profile.png"; // 기본 프로필 이미지
+    private String profileImg;
 
     public UserEntity(String id, String password) {
         this.id = id;
         this.password = password;
+        this.profileImg = "src/main/resources/static/default/profile.png";
+    }
+
+    public UserEntity(String id, String password, String profileImg) {
+        this.id = id;
+        this.password = password;
+        this.profileImg = profileImg;
     }
 }
