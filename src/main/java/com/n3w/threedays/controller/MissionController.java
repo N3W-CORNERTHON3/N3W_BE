@@ -23,10 +23,17 @@ public class MissionController {
 
     // [미션 상세 정보 조회]
     @GetMapping("detail/{missionId}")
-    public ResponseEntity<MissionEntity> getMission(@PathVariable Long missionId) {
-        MissionEntity mission = missionService.getMissionById(missionId);
+    public ResponseEntity<MissionEntity> getMission(
+            @RequestHeader("Authorization") String token,
+            @PathVariable Long missionId) {
+        // 토큰에서 사용자 정보 추출
+        Authentication authentication = jwtTokenProvider.getAuthentication(token.replace("Bearer ", ""));
+        String userId = authentication.getName();  // userId 가져오기
+
+        MissionEntity mission = missionService.getMissionById(userId, missionId);
         return ResponseEntity.ok(mission);
     }
+
 
     // [진행중 상태 미션 유무 조회]
     @GetMapping("/ongoing")
@@ -40,6 +47,7 @@ public class MissionController {
         response.put("hasOngoingMission", hasOngoing);
         return ResponseEntity.ok(response);
     }
+
 
     // [랜덤 미션 조회]
     @GetMapping("/random")
@@ -57,6 +65,7 @@ public class MissionController {
         return ResponseEntity.ok(randomMission);
     }
 
+
     // [미션 상태 변경]
     @PutMapping("status/{missionId}/status")
     public ResponseEntity<MissionEntity> updateMissionStatus(
@@ -71,6 +80,7 @@ public class MissionController {
         MissionEntity updatedMission = missionService.updateMissionStatus(missionId, userId, newStatus);
         return ResponseEntity.ok(updatedMission);
     }
+
 
     // [미션 생성]
     @PostMapping
@@ -96,6 +106,7 @@ public class MissionController {
         return ResponseEntity.ok(savedMission);
     }
 
+
     // [미션 수정]
     @PutMapping("/{missionId}")
     public ResponseEntity<MissionEntity> updateMission(
@@ -112,6 +123,7 @@ public class MissionController {
 
         return ResponseEntity.ok(updatedMission);
     }
+
 
     // [미션 삭제]
     @DeleteMapping("/{missionId}")
@@ -149,6 +161,7 @@ public class MissionController {
         return ResponseEntity.ok(response);
     }
 
+
     // [전체 미션 목록 조회]
     @GetMapping
     public ResponseEntity<?> allMission(@RequestHeader("Authorization") String token) {
@@ -168,6 +181,7 @@ public class MissionController {
 
         return ResponseEntity.ok(missions);
     }
+
 
     // [카테고리 별 미션 목록 조회]
     @GetMapping("/category/{category}")
@@ -192,5 +206,34 @@ public class MissionController {
         return ResponseEntity.ok(missions);
     }
 
+
+    // [미션 성취율 증가]
+    @PutMapping("/check/{missionId}")
+    public ResponseEntity<MissionEntity> increaseAchievement(
+            @PathVariable Long missionId,
+            @RequestHeader("Authorization") String token) {
+
+        // 토큰에서 사용자 정보 추출
+        Authentication authentication = jwtTokenProvider.getAuthentication(token.replace("Bearer ", ""));
+        String userId = authentication.getName();
+
+        MissionEntity updatedMission = missionService.increaseAchievement(missionId, userId);
+        return ResponseEntity.ok(updatedMission);
+    }
+
+
+    // [미션 성취율 감소]
+    @PutMapping("/uncheck/{missionId}")
+    public ResponseEntity<MissionEntity> decreaseAchievement(
+            @PathVariable Long missionId,
+            @RequestHeader("Authorization") String token) {
+
+        // 토큰에서 사용자 정보 추출
+        Authentication authentication = jwtTokenProvider.getAuthentication(token.replace("Bearer ", ""));
+        String userId = authentication.getName();
+
+        MissionEntity updatedMission = missionService.decreaseAchievement(missionId, userId);
+        return ResponseEntity.ok(updatedMission);
+    }
 
 }
