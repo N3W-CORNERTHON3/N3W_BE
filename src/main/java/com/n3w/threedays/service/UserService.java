@@ -4,6 +4,8 @@ import com.n3w.threedays.dto.LoginRequestDto;
 import com.n3w.threedays.dto.SignupRequestDto;
 import com.n3w.threedays.dto.TokenResponseDto;
 import com.n3w.threedays.entity.UserEntity;
+import com.n3w.threedays.exception.DuplicateIDException;
+import com.n3w.threedays.exception.IncorrectLoginException;
 import com.n3w.threedays.repository.UserRepository;
 import com.n3w.threedays.security.JwtTokenProvider;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,7 +27,7 @@ public class UserService {
     public void signup(SignupRequestDto request){
         // 아이디 중복 확인
         if (checkId(request.getId())) {
-            throw new IllegalArgumentException("사용 중인 아이디입니다.");
+            throw new DuplicateIDException("사용 중인 아이디입니다.");
         }
 
         // 비번 암호화
@@ -44,10 +46,10 @@ public class UserService {
     // 로그인
     public TokenResponseDto login(LoginRequestDto request){
         UserEntity user = userRepository.findById(request.getId())
-                .orElseThrow(() -> new IllegalArgumentException("아이디가 존재하지 않습니다."));
+                .orElseThrow(() -> new IncorrectLoginException("아이디가 틀렸습니다."));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 틀렸습니다.");
+            throw new IncorrectLoginException("비밀번호가 틀렸습니다.");
         }
 
         String token = jwtTokenProvider.generateToken(user.getId());

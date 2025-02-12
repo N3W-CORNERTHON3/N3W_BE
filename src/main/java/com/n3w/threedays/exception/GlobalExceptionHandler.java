@@ -34,5 +34,19 @@ public class GlobalExceptionHandler {
         errorResponse.put("error", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
+
+    @ExceptionHandler(DuplicateIDException.class)
+    public ResponseEntity<Map<String, String>> DuplicateIDException(DuplicateIDException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    @ExceptionHandler(IncorrectLoginException.class)
+    public ResponseEntity<Map<String, String>> IncorrectLoginException(IncorrectLoginException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+    }
 }
 
