@@ -4,6 +4,7 @@ import com.n3w.threedays.dto.LoginRequestDto;
 import com.n3w.threedays.dto.ResponseDto;
 import com.n3w.threedays.dto.SignupRequestDto;
 import com.n3w.threedays.dto.TokenResponseDto;
+import com.n3w.threedays.exception.DuplicateIDException;
 import com.n3w.threedays.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +24,9 @@ public class UserController {
         ResponseDto<Integer> response;
         
         if(isDuplicate){
-            response = new ResponseDto<>(400, false,"중복 아이디", 1);
+            throw new DuplicateIDException("사용 중인 아이디");
         } else {
-            response = new ResponseDto<>(200, true,"사용 가능한 아이디", 1);
+                response = new ResponseDto<>(200, true,"사용 가능한 아이디", 1);
         }
         
         return ResponseEntity.ok(response);
@@ -34,9 +35,9 @@ public class UserController {
     // 회원가입
     @PostMapping("/signup")
     public ResponseEntity<ResponseDto<Integer>> signup(@Valid @RequestBody SignupRequestDto request){
-        boolean isCheckId = userService.checkId(request.getId());
-        if (isCheckId){
-            return ResponseEntity.badRequest().body(new ResponseDto<>(400, false, "아이디 중복", 0));
+        boolean duplicateId = userService.checkId(request.getId());
+        if (duplicateId){
+            throw new DuplicateIDException("사용 중인 아이디");
         }
 
         userService.signup(request);
