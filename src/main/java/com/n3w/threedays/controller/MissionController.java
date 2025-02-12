@@ -215,7 +215,7 @@ public class MissionController {
 
         // 토큰에서 사용자 정보 추출
         Authentication authentication = jwtTokenProvider.getAuthentication(token.replace("Bearer ", ""));
-        String userId = authentication.getName();  // userId 가져오기
+        String userId = authentication.getName();
 
         MissionEntity updatedMission = missionService.increaseAchievement(missionId, userId);
         return ResponseEntity.ok(updatedMission);
@@ -230,7 +230,7 @@ public class MissionController {
 
         // 토큰에서 사용자 정보 추출
         Authentication authentication = jwtTokenProvider.getAuthentication(token.replace("Bearer ", ""));
-        String userId = authentication.getName();  // userId 가져오기
+        String userId = authentication.getName();
 
         MissionEntity updatedMission = missionService.decreaseAchievement(missionId, userId);
         return ResponseEntity.ok(updatedMission);
