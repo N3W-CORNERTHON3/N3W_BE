@@ -112,6 +112,27 @@ public class MissionController {
         return ResponseEntity.ok(updatedMission);
     }
 
+    // [미션 삭제]
+    @DeleteMapping("/{missionId}")
+    public ResponseEntity<Map<String, String>> deleteMission(
+            @RequestHeader("Authorization") String token,
+            @PathVariable Long missionId) {
+
+        // 토큰에서 사용자 정보 추출
+        Authentication authentication = jwtTokenProvider.getAuthentication(token.replace("Bearer ", ""));
+        String userId = authentication.getName();  // userId 가져오기
+
+        // 미션 삭제 및 삭제된 미션 이름 가져오기
+        String missionName = missionService.deleteMission(userId, missionId);
+
+        // 응답 메시지 생성
+        Map<String, String> response = new HashMap<>();
+        response.put("message", missionName + " 미션이 삭제되었습니다.");
+
+        return ResponseEntity.ok(response);
+    }
+
+
     // [목록 유무 조회]
     @GetMapping("/exists")
     public ResponseEntity<Map<String, Boolean>> checkRegisteredMission(@RequestHeader("Authorization") String token) {
