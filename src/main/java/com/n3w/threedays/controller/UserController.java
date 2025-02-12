@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/member")
@@ -65,5 +66,16 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    // 프로필 수정
+    @PutMapping("/profiles")
+    public ResponseEntity<ResponseDto<String>> changeUssrProfile(@RequestHeader("Authorization") String token, @RequestParam("image") MultipartFile imageFile){
+        Authentication authentication = jwtTokenProvider.getAuthentication(token.replace("Bearer ", ""));
+        String userId = authentication.getName();
 
+        String newImg = userService.changeUserImg(userId, imageFile);
+
+        ResponseDto<String> response = new ResponseDto<>(200, true, "프로필 수정 성공", newImg);
+
+        return ResponseEntity.ok(response);
+    }
 }
