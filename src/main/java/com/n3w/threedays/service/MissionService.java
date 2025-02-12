@@ -1,5 +1,6 @@
 package com.n3w.threedays.service;
 
+import com.n3w.threedays.dto.MissionRequestDto;
 import com.n3w.threedays.entity.MissionEntity;
 import com.n3w.threedays.exception.MissionNotFoundException;
 import com.n3w.threedays.exception.NoRandomMissionFoundException;
@@ -8,6 +9,7 @@ import com.n3w.threedays.repository.MissionRepository;
 import com.n3w.threedays.security.JwtTokenProvider;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -71,6 +73,27 @@ public class MissionService {
     }
 
     public MissionEntity createMission(MissionEntity mission) {
+        return missionRepository.save(mission);
+    }
+
+    // [미션 수정]
+    public MissionEntity updateMission(String userId, Long missionId, MissionRequestDto requestDto) {
+        // 미션이 존재하는지 확인 (잘못된 요청 등 처리)
+        MissionEntity mission = missionRepository.findById(missionId)
+                .orElseThrow(() -> new IllegalArgumentException("선택한 미션이 존재하지 않거나 이미 삭제되었습니다."));
+
+        // 로그인한 사용자와 미션의 소유자가 일치하는지 확인
+        if (!mission.getUserId().equals(userId)) {
+            throw new AccessDeniedException("해당 미션을 수정할 권한이 없습니다.");
+        }
+
+        // 수정할 내용 반영
+        mission.setName(requestDto.getName());
+        mission.setCategory(requestDto.getCategory());
+        mission.setLevel(requestDto.getLevel());
+        mission.setMemo(requestDto.getMemo());
+
+        // 수정된 미션 저장
         return missionRepository.save(mission);
     }
 

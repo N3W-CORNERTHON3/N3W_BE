@@ -95,7 +95,24 @@ public class MissionController {
         return ResponseEntity.ok(savedMission);
     }
 
-    // [미션 목록 유무 조회]
+    // [미션 수정]
+    @PutMapping("/{missionId}")
+    public ResponseEntity<MissionEntity> updateMission(
+            @RequestHeader("Authorization") String token,
+            @PathVariable Long missionId,
+            @RequestBody MissionRequestDto requestDto) {
+
+        // 토큰에서 사용자 정보 추출
+        Authentication authentication = jwtTokenProvider.getAuthentication(token.replace("Bearer ", ""));
+        String userId = authentication.getName();  // userId 가져오기
+
+        // 미션 수정
+        MissionEntity updatedMission = missionService.updateMission(userId, missionId, requestDto);
+
+        return ResponseEntity.ok(updatedMission);
+    }
+
+    // [목록 유무 조회]
     @GetMapping("/exists")
     public ResponseEntity<Map<String, Boolean>> checkRegisteredMission(@RequestHeader("Authorization") String token) {
         // 토큰에서 사용자 정보 추출
