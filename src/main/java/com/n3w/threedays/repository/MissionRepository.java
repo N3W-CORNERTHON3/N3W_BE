@@ -19,4 +19,7 @@ public interface MissionRepository extends JpaRepository<MissionEntity, Long> {
             List<MissionEntity.Status> statuses
     );
 
+    // 사용자가 등록한 미션 유무 확인
+    boolean existsByUserId(String userId);
+
 }

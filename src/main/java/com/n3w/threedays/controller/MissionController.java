@@ -95,5 +95,20 @@ public class MissionController {
         return ResponseEntity.ok(savedMission);
     }
 
+    // [미션 목록 유무 조회]
+    @GetMapping("/exists")
+    public ResponseEntity<Map<String, Boolean>> checkRegisteredMission(@RequestHeader("Authorization") String token) {
+        // 토큰에서 사용자 정보 추출
+        Authentication authentication = jwtTokenProvider.getAuthentication(token.replace("Bearer ", ""));
+        String userId = authentication.getName();  // userId 가져오기
+
+        boolean hasRegisteredMission = missionService.hasRegisteredMission(userId);
+
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("hasRegisteredMission", hasRegisteredMission);
+
+        return ResponseEntity.ok(response);
+    }
+
 
 }

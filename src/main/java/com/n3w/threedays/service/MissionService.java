@@ -73,4 +73,10 @@ public class MissionService {
     public MissionEntity createMission(MissionEntity mission) {
         return missionRepository.save(mission);
     }
+
+    // [미션 목록 유무 조회]
+    public boolean hasRegisteredMission(String userId) {
+        return missionRepository.existsByUserId(userId);
+    }
+
 }
