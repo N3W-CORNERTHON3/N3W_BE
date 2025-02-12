@@ -24,15 +24,26 @@ public class MissionService {
     private final JwtTokenProvider jwtTokenProvider;
 
     // [특정 미션 조회]
-    public MissionEntity getMissionById(Long missionId) {
+    public MissionEntity getMissionById(String userId, Long missionId) {
+        // 미션 조회(없으면 예외 발생)
+        MissionEntity mission = missionRepository.findById(missionId)
+                .orElseThrow(() -> new MissionNotFoundException(missionId));
+
+        // 로그인한 사용자의 미션인지 확인
+        if (!mission.getUserId().equals(userId)) {
+            throw new UnauthorizedException("해당 미션을 조회할 권한이 없습니다.");
+        }
+
         return missionRepository.findById(missionId)
                 .orElseThrow(() -> new MissionNotFoundException(missionId));
     }
+
 
     // [진행중 상태인 미션 조회]
     public boolean hasOngoingMission(String userId) {
         return missionRepository.existsByUserIdAndStatus(userId, MissionEntity.Status.PROGRESSING);
     }
+
 
     // [랜덤 미션 조회]
     public MissionEntity getRandomMission(String userId, MissionEntity.Level level,
@@ -55,6 +66,7 @@ public class MissionService {
         return missions.get(random.nextInt(missions.size()));
     }
 
+
     // [미션 상태 변경]
     @Transactional
     public MissionEntity updateMissionStatus(Long missionId, String userId, MissionEntity.Status newStatus) {
@@ -72,9 +84,12 @@ public class MissionService {
         return mission; // 변경된 미션 반환
     }
 
+
+    // [미션 생성]
     public MissionEntity createMission(MissionEntity mission) {
         return missionRepository.save(mission);
     }
+
 
     // [미션 수정]
     public MissionEntity updateMission(String userId, Long missionId, MissionRequestDto requestDto) {
@@ -97,6 +112,7 @@ public class MissionService {
         return missionRepository.save(mission);
     }
 
+
     // [미션 삭제]
     public String deleteMission(String userId, Long missionId) {
         // 미션이 존재하는지 확인 (잘못된 요청 등 처리)
@@ -116,19 +132,63 @@ public class MissionService {
         return missionName; // 삭제된 미션 이름 반환
     }
 
+
     // [미션 목록 유무 조회]
     public boolean hasRegisteredMission(String userId) {
         return missionRepository.existsByUserId(userId);
     }
+
 
     // [전체 미션 목록 조회]
     public List<MissionEntity> getAllMissions(String userId) {
         return missionRepository.findByUserId(userId);
     }
 
+
     // [카테고리 별 미션 목록 조회]
     public List<MissionEntity> getMissionsByCategory(String userId, MissionEntity.Category category) {
         return missionRepository.findByUserIdAndCategory(userId, category);
     }
 
+
+    // [미션 성취율 증가]
+    @Transactional
+    public MissionEntity increaseAchievement(Long missionId, String userId) {
+        // 미션 조회
+        MissionEntity mission = missionRepository.findById(missionId)
+                .orElseThrow(() -> new MissionNotFoundException(missionId));
+
+        // 로그인한 사용자의 미션인지 확인
+        if (!mission.getUserId().equals(userId)) {
+            throw new UnauthorizedException("해당 미션을 수정할 권한이 없습니다.");
+        }
+
+        // 성취율 증가 (최대 3 제한)
+        if (mission.getAchievement() < 3) {
+            mission.setAchievement(mission.getAchievement() + 1);
+        }
+
+        return mission;
+    }
+
+
+    // [미션 성취율 감소]
+    @Transactional
+    public MissionEntity decreaseAchievement(Long missionId, String userId) {
+        // 미션 조회
+        MissionEntity mission = missionRepository.findById(missionId)
+                .orElseThrow(() -> new MissionNotFoundException(missionId));
+
+        // 로그인한 사용자의 미션인지 확인
+        if (!mission.getUserId().equals(userId)) {
+            throw new UnauthorizedException("해당 미션을 수정할 권한이 없습니다.");
+        }
+
+        // 성취율 감소 (최소 0 제한)
+        if (mission.getAchievement() > 0) {
+            mission.setAchievement(mission.getAchievement() - 1);
+        }
+
+        return mission;
+    }
 }
