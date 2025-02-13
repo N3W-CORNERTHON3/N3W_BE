@@ -4,18 +4,19 @@ import com.n3w.threedays.dto.MissionRequestDto;
 import com.n3w.threedays.entity.MissionEntity;
 import com.n3w.threedays.exception.MissionNotFoundException;
 import com.n3w.threedays.exception.NoRandomMissionFoundException;
+import com.n3w.threedays.exception.NotFoundAchiveMissionException;
 import com.n3w.threedays.exception.UnauthorizedException;
 import com.n3w.threedays.repository.MissionRepository;
 import com.n3w.threedays.security.JwtTokenProvider;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+
 
 @Service
 @RequiredArgsConstructor
@@ -194,6 +195,30 @@ public class MissionService {
     }
 
 
+    // [성취 미션 조회]
+    public List<MissionEntity> getAchiveMission(String id) {
+        List<MissionEntity> missionList = missionRepository.findByUserIdAndStatus(id, MissionEntity.Status.COMPLETE);
+
+        if (missionList.isEmpty()){
+            throw new NotFoundAchiveMissionException("성취한 미션이 없습니다.");
+        }
+
+        return missionList;
+    }
+
+  
+    // [카테고리 별 성취 미션 조회]
+    public List<MissionEntity> getAchiveMissionListByCategory(String id, MissionEntity.Category category) {
+        List<MissionEntity> missionListByCategory = missionRepository.findByUserIdAndCategoryAndStatus(id, category, MissionEntity.Status.COMPLETE);
+
+        if (missionListByCategory.isEmpty()){
+            throw new NotFoundAchiveMissionException("해당 카테고리에 성취한 미션이 없습니다.");
+        }
+
+        return missionListByCategory;
+    }
+  
+  
     // [메모 저장&수정]
     @Transactional // @Transactional: save() 호출 없이 자동으로 반영됨 (JPA 영속성 컨텍스트)
     public MissionEntity updateMemo(Long missionId, String userId, String newMemo) {
