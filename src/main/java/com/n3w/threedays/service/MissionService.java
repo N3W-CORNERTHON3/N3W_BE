@@ -241,7 +241,7 @@ public class MissionService {
 
     // [챌린지 시작]
     @Transactional
-    public void startMission(Long missionId, String userId) {
+    public MissionEntity startMission(Long missionId, String userId) {
         MissionEntity mission = missionRepository.findById(missionId)
                 .orElseThrow(() -> new MissionNotFoundException(missionId));
 
@@ -259,5 +259,7 @@ public class MissionService {
         mission.setEndDate(endDate);
 
         missionRepository.save(mission);
+
+        return mission;
     }
 }

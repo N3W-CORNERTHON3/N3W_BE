@@ -257,7 +257,7 @@ public class MissionController {
 
     // [챌린지 시작]
     @PutMapping("/start/{missionId}")
-    public ResponseEntity<String> startMission(
+    public ResponseEntity<MissionEntity> startMission(
             @PathVariable Long missionId,
             @RequestHeader("Authorization") String token) {
         // 토큰에서 사용자 정보 추출
@@ -265,8 +265,8 @@ public class MissionController {
         String userId = authentication.getName();
 
 
-        missionService.startMission(missionId, userId);
+        MissionEntity updatedMission = missionService.startMission(missionId, userId);
 
-        return ResponseEntity.ok("미션이 시작되었습니다.");
+        return ResponseEntity.ok(updatedMission);
     }
 }
