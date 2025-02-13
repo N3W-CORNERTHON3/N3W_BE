@@ -21,6 +21,7 @@ import java.util.Random;
 @Service
 @RequiredArgsConstructor
 public class MissionService {
+
     private final MissionRepository missionRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -193,6 +194,7 @@ public class MissionService {
         return mission;
     }
 
+
     // [성취 미션 조회]
     public List<MissionEntity> getAchiveMission(String id) {
         List<MissionEntity> missionList = missionRepository.findByUserIdAndStatus(id, MissionEntity.Status.COMPLETE);
@@ -204,6 +206,7 @@ public class MissionService {
         return missionList;
     }
 
+  
     // [카테고리 별 성취 미션 조회]
     public List<MissionEntity> getAchiveMissionListByCategory(String id, MissionEntity.Category category) {
         List<MissionEntity> missionListByCategory = missionRepository.findByUserIdAndCategoryAndStatus(id, category, MissionEntity.Status.COMPLETE);
@@ -213,5 +216,24 @@ public class MissionService {
         }
 
         return missionListByCategory;
+    }
+  
+  
+    // [메모 저장&수정]
+    @Transactional // @Transactional: save() 호출 없이 자동으로 반영됨 (JPA 영속성 컨텍스트)
+    public MissionEntity updateMemo(Long missionId, String userId, String newMemo) {
+        // 미션 조회
+        MissionEntity mission = missionRepository.findById(missionId)
+                .orElseThrow(() -> new MissionNotFoundException(missionId));
+
+        // 로그인한 사용자의 미션인지 확인
+        if (!mission.getUserId().equals(userId)) {
+            throw new UnauthorizedException("해당 미션을 수정할 권한이 없습니다.");
+        }
+
+        // 메모 업데이트
+        mission.setMemo(newMemo != null ? newMemo : "");  // null 방지
+
+        return mission;
     }
 }

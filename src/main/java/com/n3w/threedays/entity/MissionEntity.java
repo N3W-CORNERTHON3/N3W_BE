@@ -53,8 +53,8 @@ public class MissionEntity {
     @Column(nullable = false, updatable = false)
     private LocalDate date = LocalDate.now();  // 현재 날짜 자동 저장
 
-    @Column(nullable = true)
-    private String memo;  // 선택값 (nullable 허용)
+    @Column(length = 1000, nullable = false)
+    private String memo = ""; // 기본값을 빈 문자열로 설정
 
     public MissionEntity(String userId, String name, Category category, Level level) {
         this.userId = userId;
@@ -64,5 +64,6 @@ public class MissionEntity {
         this.achievement = 0;
         this.status = Status.INCOMPLETE;
         this.date = LocalDate.now();
+        this.memo = "";
     }
 }
