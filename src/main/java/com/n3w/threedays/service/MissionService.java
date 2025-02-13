@@ -96,13 +96,13 @@ public class MissionService {
 
     // [미션 수정]
     public MissionEntity updateMission(String userId, Long missionId, MissionRequestDto requestDto) {
-        // 미션이 존재하는지 확인 (잘못된 요청 등 처리)
+        // 미션 조회(없으면 예외 발생)
         MissionEntity mission = missionRepository.findById(missionId)
-                .orElseThrow(() -> new IllegalArgumentException("선택한 미션이 존재하지 않거나 이미 삭제되었습니다."));
+                .orElseThrow(() -> new MissionNotFoundException(missionId));
 
-        // 로그인한 사용자와 미션의 소유자가 일치하는지 확인
+        // 로그인한 사용자의 미션인지 확인
         if (!mission.getUserId().equals(userId)) {
-            throw new AccessDeniedException("해당 미션을 수정할 권한이 없습니다.");
+            throw new UnauthorizedException("해당 미션을 수정할 권한이 없습니다.");
         }
 
         // 수정할 내용 반영
@@ -118,13 +118,13 @@ public class MissionService {
 
     // [미션 삭제]
     public String deleteMission(String userId, Long missionId) {
-        // 미션이 존재하는지 확인 (잘못된 요청 등 처리)
+        // 미션 조회(없으면 예외 발생)
         MissionEntity mission = missionRepository.findById(missionId)
-                .orElseThrow(() -> new IllegalArgumentException("선택한 미션이 존재하지 않거나 이미 삭제되었습니다."));
+                .orElseThrow(() -> new MissionNotFoundException(missionId));
 
-        // 로그인한 사용자와 미션의 소유자가 일치하는지 확인
+        // 로그인한 사용자의 미션인지 확인
         if (!mission.getUserId().equals(userId)) {
-            throw new AccessDeniedException("해당 미션을 수정할 권한이 없습니다.");
+            throw new UnauthorizedException("해당 미션을 수정할 권한이 없습니다.");
         }
 
         String missionName = mission.getName(); // 미션 이름 저장
