@@ -63,5 +63,12 @@ public class GlobalExceptionHandler {
         errorResponse.put("error", "업로드 파일 크기가 너무 큽니다.");
         return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(errorResponse);
     }
+
+    @ExceptionHandler(NotFoundAchiveMissionException.class)
+    public ResponseEntity<Map<String, String>> handleNotFoundAchiveMissionException(NotFoundAchiveMissionException ex){
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
 }
 
