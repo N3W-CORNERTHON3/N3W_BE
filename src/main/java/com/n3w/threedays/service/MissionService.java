@@ -4,18 +4,20 @@ import com.n3w.threedays.dto.MissionRequestDto;
 import com.n3w.threedays.entity.MissionEntity;
 import com.n3w.threedays.exception.MissionNotFoundException;
 import com.n3w.threedays.exception.NoRandomMissionFoundException;
+import com.n3w.threedays.exception.NotFoundAchiveMissionException;
 import com.n3w.threedays.exception.UnauthorizedException;
 import com.n3w.threedays.repository.MissionRepository;
 import com.n3w.threedays.security.JwtTokenProvider;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -190,5 +192,18 @@ public class MissionService {
         }
 
         return mission;
+    }
+
+    // [성취 미션 조회]
+    public List<MissionEntity> getAchiveMission(String id) {
+        List<MissionEntity> missionList = missionRepository.findByUserId(id).stream()
+                .filter(mission -> mission.getStatus().equals(MissionEntity.Status.COMPLETE))
+                .collect(Collectors.toList());
+
+        if (missionList.isEmpty()){
+            throw new NotFoundAchiveMissionException("성취한 미션이 없습니다.");
+        }
+
+        return missionList;
     }
 }
