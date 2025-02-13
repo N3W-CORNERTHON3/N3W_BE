@@ -236,4 +236,22 @@ public class MissionController {
         return ResponseEntity.ok(updatedMission);
     }
 
+
+    // [메모 저장&수정]
+    @PutMapping("/memo/{missionId}")
+    public ResponseEntity<MissionEntity> updateMemo(
+            @PathVariable Long missionId,
+            @RequestHeader("Authorization") String token,
+            @RequestBody Map<String, String> requestBody) {
+
+        // 토큰에서 사용자 정보 추출
+        Authentication authentication = jwtTokenProvider.getAuthentication(token.replace("Bearer ", ""));
+        String userId = authentication.getName();
+
+        String newMemo = requestBody.getOrDefault("memo", "");  // null이면 ""로 변경
+
+        MissionEntity updatedMission = missionService.updateMemo(missionId, userId, newMemo);
+        return ResponseEntity.ok(updatedMission);
+    }
+
 }
