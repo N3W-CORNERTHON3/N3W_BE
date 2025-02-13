@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -233,6 +234,36 @@ public class MissionService {
 
         // 메모 업데이트
         mission.setMemo(newMemo != null ? newMemo : "");  // null 방지
+
+        return mission;
+    }
+
+
+    // [챌린지 시작]
+    @Transactional
+    public MissionEntity startMission(Long missionId, String userId) {
+        // 이미 진행 중인 미션이 있는지 체크
+        if (missionRepository.findFirstByUserIdAndStatus(userId, MissionEntity.Status.PROGRESSING).isPresent()) {
+            throw new IllegalStateException("이미 진행 중인 미션이 있습니다.");
+        }
+
+        MissionEntity mission = missionRepository.findById(missionId)
+                .orElseThrow(() -> new MissionNotFoundException(missionId));
+
+        if (!mission.getUserId().equals(userId)) {
+            throw new UnauthorizedException("해당 미션을 시작할 권한이 없습니다.");
+        }
+
+        // 미션 상태를 진행중으로 변경
+        mission.setStatus(MissionEntity.Status.PROGRESSING);
+
+        // 시작 날짜와 종료 날짜 설정
+        LocalDate startDate = LocalDate.now();
+        LocalDate endDate = startDate.plusDays(3);
+        mission.setStartDate(startDate);
+        mission.setEndDate(endDate);
+
+        missionRepository.save(mission);
 
         return mission;
     }

@@ -4,7 +4,9 @@ import com.n3w.threedays.entity.MissionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MissionRepository extends JpaRepository<MissionEntity, Long> {
@@ -33,5 +35,12 @@ public interface MissionRepository extends JpaRepository<MissionEntity, Long> {
 
     // 카테고리별 성취 미션 목록 확인
     List<MissionEntity> findByUserIdAndCategoryAndStatus(String userId, MissionEntity.Category category, MissionEntity.Status status);
+
+
+    // 특정 사용자의 진행 중인 미션 조회
+    Optional<MissionEntity> findFirstByUserIdAndStatus(String userId, MissionEntity.Status status);
+
+    // 종료 날짜가 지난 진행 중인 미션 조회
+    List<MissionEntity> findByStatusAndEndDateBefore(MissionEntity.Status status, LocalDate date);
 
 }
