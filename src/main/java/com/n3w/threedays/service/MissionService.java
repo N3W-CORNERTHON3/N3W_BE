@@ -242,6 +242,11 @@ public class MissionService {
     // [챌린지 시작]
     @Transactional
     public MissionEntity startMission(Long missionId, String userId) {
+        // 이미 진행 중인 미션이 있는지 체크
+        if (missionRepository.findFirstByUserIdAndStatus(userId, MissionEntity.Status.PROGRESSING).isPresent()) {
+            throw new IllegalStateException("이미 진행 중인 미션이 있습니다.");
+        }
+
         MissionEntity mission = missionRepository.findById(missionId)
                 .orElseThrow(() -> new MissionNotFoundException(missionId));
 
