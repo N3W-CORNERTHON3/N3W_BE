@@ -22,7 +22,7 @@ public class MissionScheduler {
     }
 
     // 매일 00:00:01 실행
-    @Scheduled(cron = "1 0 0 * * *")
+    @Scheduled(cron = "0 1 0 * * *")
     @Transactional
     public void completeExpiredMissions() {
         LocalDate today = LocalDate.now();
