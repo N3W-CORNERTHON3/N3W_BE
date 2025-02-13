@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -196,14 +195,23 @@ public class MissionService {
 
     // [성취 미션 조회]
     public List<MissionEntity> getAchiveMission(String id) {
-        List<MissionEntity> missionList = missionRepository.findByUserId(id).stream()
-                .filter(mission -> mission.getStatus().equals(MissionEntity.Status.COMPLETE))
-                .collect(Collectors.toList());
+        List<MissionEntity> missionList = missionRepository.findByUserIdAndStatus(id, MissionEntity.Status.COMPLETE);
 
         if (missionList.isEmpty()){
             throw new NotFoundAchiveMissionException("성취한 미션이 없습니다.");
         }
 
         return missionList;
+    }
+
+    // [카테고리 별 성취 미션 조회]
+    public List<MissionEntity> getAchiveMissionListByCategory(String id, MissionEntity.Category category) {
+        List<MissionEntity> missionListByCategory = missionRepository.findByUserIdAndCategoryAndStatus(id, category, MissionEntity.Status.COMPLETE);
+
+        if (missionListByCategory.isEmpty()){
+            throw new NotFoundAchiveMissionException("해당 카테고리에 성취한 미션이 없습니다.");
+        }
+
+        return missionListByCategory;
     }
 }

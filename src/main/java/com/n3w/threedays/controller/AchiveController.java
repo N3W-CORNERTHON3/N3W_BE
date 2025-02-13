@@ -29,4 +29,16 @@ public class AchiveController {
 
         return ResponseEntity.ok(response);
     }
+
+        @GetMapping("/category")
+        public ResponseEntity<ResponseDto<List<MissionEntity>>> getAchiveMissionListByCategory(@RequestHeader("Authorization") String token, @RequestParam("category") MissionEntity.Category category) {
+            Authentication authentication = jwtTokenProvider.getAuthentication(token.replace("Bearer ", ""));
+            String userId = authentication.getName();
+
+            List<MissionEntity> achiveMissionList = missionService.getAchiveMissionListByCategory(userId, category);
+
+            ResponseDto<List<MissionEntity>> response = new ResponseDto<>(200, true, "카테고리별 성취 미션 조회 성공", achiveMissionList);
+
+            return ResponseEntity.ok(response);
+        }
 }
