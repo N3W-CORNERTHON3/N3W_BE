@@ -10,7 +10,6 @@ import com.n3w.threedays.repository.MissionRepository;
 import com.n3w.threedays.security.JwtTokenProvider;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -109,7 +108,6 @@ public class MissionService {
         mission.setName(requestDto.getName());
         mission.setCategory(requestDto.getCategory());
         mission.setLevel(requestDto.getLevel());
-        mission.setMemo(requestDto.getMemo());
 
         // 수정된 미션 저장
         return missionRepository.save(mission);

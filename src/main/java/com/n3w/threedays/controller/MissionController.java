@@ -98,13 +98,16 @@ public class MissionController {
                 requestDto.getCategory(),
                 requestDto.getLevel()
         );
-        newMission.setMemo(requestDto.getMemo());
+
+        // memo 값을 강제로 빈 문자열("")로 설정
+//        newMission.setMemo("");
 
         // 미션 저장
         MissionEntity savedMission = missionService.createMission(newMission);
 
         return ResponseEntity.ok(savedMission);
     }
+
 
 
     // [미션 수정]

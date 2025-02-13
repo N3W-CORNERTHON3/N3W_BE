@@ -8,7 +8,7 @@ public class MissionRequestDto {
     private String name;
     private MissionEntity.Category category;
     private MissionEntity.Level level;
-    private String memo;  // null 가능
+    private String memo;
 
     public String getName() {
         return name;
