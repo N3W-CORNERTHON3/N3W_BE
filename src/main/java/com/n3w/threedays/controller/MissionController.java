@@ -254,4 +254,19 @@ public class MissionController {
         return ResponseEntity.ok(updatedMission);
     }
 
+
+    // [챌린지 시작]
+    @PutMapping("/start/{missionId}")
+    public ResponseEntity<String> startMission(
+            @PathVariable Long missionId,
+            @RequestHeader("Authorization") String token) {
+        // 토큰에서 사용자 정보 추출
+        Authentication authentication = jwtTokenProvider.getAuthentication(token.replace("Bearer ", ""));
+        String userId = authentication.getName();
+
+
+        missionService.startMission(missionId, userId);
+
+        return ResponseEntity.ok("미션이 시작되었습니다.");
+    }
 }
