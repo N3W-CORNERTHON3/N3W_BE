@@ -86,6 +86,10 @@ public class UserService {
         UserEntity user = userRepository.findUserById(id)
                 .orElseThrow(() -> new RuntimeException("사용자 정보를 찾을 수 없습니다."));
 
+        if (DEFAULT_IMG.equals(user.getProfileImg())) {
+            user.setProfileImg("defualtImg");
+        }
+
         return new ProfilesResponseDto(user.getId(), user.getProfileImg());
     }
 
@@ -95,7 +99,7 @@ public class UserService {
         String currentImgUrl  = getUserInfo(id).getProfileImg();
 
         // 이미지가 존재하면 삭제(기본 이미지는 제외)
-        if (!DEFAULT_IMG.equals(currentImgUrl) && StringUtils.hasText(currentImgUrl)) {
+        if (!currentImgUrl.equals("defualtImg") && StringUtils.hasText(currentImgUrl)) {
             // 파일명 추출
             String fileName = extractObjectKeyFromUrl(currentImgUrl);
             try {
