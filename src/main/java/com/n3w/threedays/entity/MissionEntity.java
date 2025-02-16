@@ -18,7 +18,7 @@ public class MissionEntity {
     }
 
     public enum Level {
-        HIGH, MEDIUM, LOW
+        HIGH, MEDIUM, LOW, RANDOM
     }
 
     public enum Status {
@@ -41,7 +41,7 @@ public class MissionEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Level level;  // HIGH, MEDIUM, LOW
+    private Level level;  // HIGH, MEDIUM, LOW, RANDOM
 
     @Column(nullable = false)
     private int achievement = 0;  // 기본값 0 (0,1,2,3)
