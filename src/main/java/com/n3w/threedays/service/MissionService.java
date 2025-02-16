@@ -56,8 +56,15 @@ public class MissionService {
                 ? Arrays.asList(MissionEntity.Status.INCOMPLETE, MissionEntity.Status.PROGRESSING, MissionEntity.Status.COMPLETE)
                 : Arrays.asList(MissionEntity.Status.INCOMPLETE, MissionEntity.Status.PROGRESSING);
 
-        // 조건에 맞는 미션 목록 가져오기
-        List<MissionEntity> missions = missionRepository.findByUserIdAndLevelAndCategoryAndStatusIn(userId, level, category, statuses);
+        List<MissionEntity> missions;
+
+        if (level == MissionEntity.Level.RANDOM) {
+            // 난이도: RANDOM -> 난이도를 무시하고 조회
+            missions = missionRepository.findByUserIdAndCategoryAndStatusIn(userId, category, statuses);
+        } else {
+            // 난이도: HIGH, MEDIUM, LOW에 맞게 조회
+            missions = missionRepository.findByUserIdAndLevelAndCategoryAndStatusIn(userId, level, category, statuses);
+        }
 
         // 미션이 없으면 예외 발생
         if (missions.isEmpty()) {
@@ -68,7 +75,6 @@ public class MissionService {
         Random random = new Random();
         return missions.get(random.nextInt(missions.size()));
     }
-
 
     // [미션 상태 변경]
     @Transactional
