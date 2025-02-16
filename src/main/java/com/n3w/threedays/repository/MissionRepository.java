@@ -13,10 +13,16 @@ public interface MissionRepository extends JpaRepository<MissionEntity, Long> {
     // 진행중 상태인 미션 여부 확인
     boolean existsByUserIdAndStatus(String userId, MissionEntity.Status status);
 
-    // 랜덤 미션 선택
+    // 랜덤 미션 선택: 난이도 선택 (HIGH, MEDIUM, LOW 중 특정 난이도 1개)
     List<MissionEntity> findByUserIdAndLevelAndCategoryAndStatusIn(
             String userId,
             MissionEntity.Level level,
+            MissionEntity.Category category,
+            List<MissionEntity.Status> statuses
+    );
+    // 랜덤 미션 선택: 난이도 RANDOM (HIGH, MEDIUM, LOW 모두 포함)
+    List<MissionEntity> findByUserIdAndCategoryAndStatusIn(
+            String userId,
             MissionEntity.Category category,
             List<MissionEntity.Status> statuses
     );
@@ -42,5 +48,6 @@ public interface MissionRepository extends JpaRepository<MissionEntity, Long> {
 
     // 종료 날짜가 지난 진행 중인 미션 조회
     List<MissionEntity> findByStatusAndEndDateBefore(MissionEntity.Status status, LocalDate date);
+
 
 }
