@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/missions")
@@ -99,14 +100,30 @@ public class MissionController {
                 requestDto.getLevel()
         );
 
-        // memo 값을 강제로 빈 문자열("")로 설정
-//        newMission.setMemo("");
-
         // 미션 저장
         MissionEntity savedMission = missionService.createMission(newMission);
 
         return ResponseEntity.ok(savedMission);
     }
+
+    // [미션 여러 개 저장]
+    @PostMapping("/batch")
+    public ResponseEntity<List<MissionEntity>> createMissions(
+            @RequestHeader("Authorization") String token,
+            @RequestBody List<MissionRequestDto> requestDtos) {
+
+        Authentication authentication = jwtTokenProvider.getAuthentication(token.replace("Bearer ", ""));
+        String userId = authentication.getName();
+
+        List<MissionEntity> newMissions = requestDtos.stream()
+                .map(dto -> new MissionEntity(userId, dto.getName(), dto.getCategory(), dto.getLevel()))
+                .collect(Collectors.toList());
+
+        List<MissionEntity> savedMissions = missionService.createMissions(newMissions);  // 여러 개 저장
+
+        return ResponseEntity.ok(savedMissions);
+    }
+
 
 
 

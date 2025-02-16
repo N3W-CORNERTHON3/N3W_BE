@@ -92,6 +92,10 @@ public class MissionService {
         return missionRepository.save(mission);
     }
 
+    // [미션 여러 개 저장]
+    public List<MissionEntity> createMissions(List<MissionEntity> missions) {
+        return missionRepository.saveAll(missions);
+    }
 
     // [미션 수정]
     public MissionEntity updateMission(String userId, Long missionId, MissionRequestDto requestDto) {
